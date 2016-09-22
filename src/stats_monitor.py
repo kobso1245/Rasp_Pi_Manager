@@ -1,11 +1,13 @@
 import subprocess
 
+
 def execute_command(command):
     exec_command = subprocess.Popen(command,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
     stdout, stderr = exec_command.communicate()
     return exec_command.returncode, stdout
+
 
 def retrieve_ram_usage():
     command = ['cat', '/proc/meminfo']
@@ -32,6 +34,7 @@ def retrieve_ram_usage():
         return needed_info
 
     return information
+
 
 def retrieve_cpu_usage():
     '''
@@ -67,6 +70,7 @@ def retrieve_cpu_usage():
         result = _parse_information(str(information))
 
     return result
+
 
 def retrieve_cpu_temp():
     command = ['cat', '/sys/class/thermal/thermal_zone0/temp']
