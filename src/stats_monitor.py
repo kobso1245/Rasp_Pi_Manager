@@ -1,5 +1,8 @@
 import subprocess
-
+import psutil
+from time import sleep
+import os
+from tabulate import tabulate
 
 def execute_command(command):
     exec_command = subprocess.Popen(command,
@@ -10,30 +13,10 @@ def execute_command(command):
 
 
 def retrieve_ram_usage():
-    command = ['cat', '/proc/meminfo']
-    ret_code, information = execute_command(command)
-
-    if ret_code == 0:
-        splitted_info = information.split('\n')
-        # format
-        def _clear_spaces(elem):
-            splitted = elem.split(':')
-            key = splitted[0]
-            value = float(splitted[1].lstrip(' ').split(' ')[0]) / 1000000
-            return (key, value)
-
-        cleared_from_spaces = map(_clear_spaces, splitted_info[:-1])
-        info_dct = dict(cleared_from_spaces)
-        needed_info = {
-            'total_ram': info_dct['MemTotal'],
-            'free_ram': info_dct['MemFree'],
-            'cached_ram': info_dct['Cached'],
-            'swap_free': info_dct['SwapFree'],
-            'swap_total': info_dct['SwapTotal']
-        }
-        return needed_info
-
-    return information
+    memory_holder = psutil.virtual_memory()
+    return {'total': memory_holder.total,
+            'available': memory_holder.available
+            }
 
 
 def retrieve_cpu_usage():
@@ -43,46 +26,44 @@ def retrieve_cpu_usage():
         cpu load
         users online
     '''
-
-    def _parse_information(information):
-        splitted_info = information.split('  ')
-        try:
-            uptime = splitted_info[1].replace(':', '.').strip(',')
-            users = int(splitted_info[2][:-6])
-            load = float(splitted_info[3][15:18].replace(',', '.'))
-        except:
-            print "Fail"
-
-        percents = load / 4
-
-        return {
-            'uptime': uptime,
-            'users_count': users,
-            'load': percents
-        }
-
-    information = {}
-
-    # check information about the CPU usage and uptime
-    uptime_command = ["uptime"]
-    ret_code, information = execute_command(uptime_command)
-    if ret_code == 0:
-        result = _parse_information(str(information))
+    cpu_freq = psutil.cpu_freq(percpu=True)
+    result = [{'curent': core.current,
+               'min': core.min,
+               'max': core.max} for core in cpu_freq]
 
     return result
 
 
 def retrieve_cpu_temp():
-    command = ['cat', '/sys/class/thermal/thermal_zone0/temp']
-    ret_code, information = execute_command(command)
-    if ret_code == 0:
-        return {
-            'temp': float(information) / 1000
-        }
+    sensor_temp = psutil.sensors_temperatures()
+    result = [{'label': label if current_device.label == ''
+              else current_device.label,
+               'current': current_device.current,
+               'high': current_device.high,
+               'crit': current_device.critical}
+              for label in sensor_temp
+              for current_device in sensor_temp[label]]
+    return result
+
 
 def retrieve_basic_information():
     ram_info = retrieve_ram_usage()
     cpu_info = retrieve_cpu_usage()
     temp_info = retrieve_cpu_temp()
 
-print retrieve_cpu_temp()
+
+def pretty_print():
+    tab_data = [['Temperatures']]
+    temp_sensors = retrieve_cpu_temp()
+    for sensor in temp_sensors:
+        tmp_data = [sensor['label'], sensor['current'], sensor['high'],
+                    sensor['crit']]
+        tab_data.append(tmp_data)
+    print(tabulate(tab_data, ['Label', 'Current', 'High', 'Critical'],
+                   'fancy_grid'))
+
+if __name__ == '__main__':
+    while True:
+        os.system('clear')
+        pretty_print()
+        sleep(1)

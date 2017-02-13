@@ -1,0 +1,4 @@
+{
+	"database": "sqlite:////tmp/test.db",
+	"test_database": "sqlite:////tmp/unittest.db"
+}

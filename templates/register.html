@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Registration page</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename = 'css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename = 'css/custom.css') }}" rel="stylesheet">
+  </head>
+
+  <body>
+    <h1>dadada</h1>
+
+    <div class="container" style="width:300px;">
+
+      <form class="form-signin">
+        <input type="text" id="registerUsername" class="form-control" placeholder="Username" required autofocus>
+        <input type="password" id="registerPassword" class="form-control" placeholder="Password" required>
+        <input type="text" id="token" class="form-control" placeholder="Unique id" required>
+        <div class="alert alert-danger" role="alert" id="registerAlert" hidden >Please provide valid credentials.</div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        <div class="test">
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="registerButton">Register</button>
+      </div>
+      </form>
+
+    </div> <!-- /container -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type = "text/javascript"
+      src="{{ url_for('static', filename = 'js/md5.min.js') }}"> </script>
+    <script type = "text/javascript"
+      src="{{ url_for('static', filename = 'js/jquery.blockUI.js') }}"> </script>
+    <script type = "text/javascript"
+      src="{{ url_for('static', filename = 'js/register.js') }}"> </script>
+
+  </body>
+</html>
